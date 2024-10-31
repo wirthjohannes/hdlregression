@@ -594,6 +594,9 @@ class SimulatorDetector:
         vivado_installed = self.is_simulator_installed(
             simulator_call="xsim", version_call="--version", simulator_name="vivado"
         )
+        bluespec_installed = self.is_simulator_installed(
+            simulator_call="bsc", version_call="--help", simulator_name="bluesim"
+        )
 
         # Determine which simulator is currently set as default
         simulator = ""
@@ -607,6 +610,8 @@ class SimulatorDetector:
             simulator = "RIVIERA_PRO"
         elif vivado_installed:
             simulator = "VIVADO"
+        elif bluespec_installed:
+            simulator = "BLUESIM"
 
         return {
             "platform": platform_info,
@@ -619,6 +624,7 @@ class SimulatorDetector:
         }
 
     def _validate_simulator_name(self, simulator_name) -> str:
+        print("Hallo")
         print(simulator_name)
         print(self.ID_BLUESIM_SIMULATOR)
         print(simulator_name in self.ID_BLUESIM_SIMULATOR)
