@@ -619,6 +619,9 @@ class SimulatorDetector:
         }
 
     def _validate_simulator_name(self, simulator_name) -> str:
+        print(simulator_name)
+        print(self.ID_BLUESIM_SIMULATOR)
+        print(simulator_name in self.ID_BLUESIM_SIMULATOR)
         if simulator_name in self.ID_MODELSIM_SIMULATOR:
             return "MODELSIM"
         elif simulator_name in self.ID_RIVIERA_SIMULATOR:
