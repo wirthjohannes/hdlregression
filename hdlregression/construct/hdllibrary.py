@@ -186,6 +186,16 @@ class HDLLibrary(Library):
                 code_coverage=code_coverage,
                 project=self.project,
             )
+        elif file_item.lower().endswith(".bsv"):
+            return BSVFile(
+                filename_with_path=file_item,
+                library=self,
+                hdl_version=hdl_version,
+                com_options=com_options,
+                parse_file=False,
+                code_coverage=code_coverage,
+                project=self.project,
+            )
         else:
             self.logger.warning("Unknown file type: %s" % (file_item))
             return UnknownFile(

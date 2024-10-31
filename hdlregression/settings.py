@@ -547,6 +547,7 @@ class SimulatorDetector:
     ID_GHDL_SIMULATOR = ["ghdl", "GHDL"]
     ID_NVC_SIMULATOR = ["nvc", "NVC"]
     ID_VIVADO_SIMULATOR = ["vivado", "VIVADO"]
+    ID_BLUESIM_SIMULATOR = ["bluesim", "BLUESIM", "bsv", "BSV", "bluespec", "BLUESPEC"]
 
 
     def __init__(self):
@@ -630,6 +631,8 @@ class SimulatorDetector:
             return "NVC"
         elif simulator_name in self.ID_VIVADO_SIMULATOR:
             return "VIVADO"
+        elif simulator_name in self.ID_BLUESIM_SIMULATOR:
+            return "BLUESIM"
         else:
             raise UnavailableSimulatorError("Simulator {} unsupported.".format(simulator_name))
         
@@ -651,6 +654,7 @@ class SimulatorDetector:
         elif sim_name == "GHDL": return GHDLSettings()
         elif sim_name == "VIVADO": return VivadoSettings()
         elif sim_name == "ALDEC": return AldecSettings()
+        elif sim_name == "BLUESIM": return BluesimSettings()
         else: raise UnavailableSimulatorError("Simulator {} not found.".format(sim_name))
 
 
@@ -805,7 +809,15 @@ class ModelsimSettings(SimulatorSettings):
 
     def get_modelsim_ini(self) -> str:
         return self.modelsim_ini
+    
+class BluesimSettings(SimulatorSettings):
+    SIMULATOR_NAME = "BLUESIM"
 
+    def __init__(self):
+        super().__init__()
+
+    def get_is_default_com_options(self) -> bool:
+        return True
 
 class NVCSettings(SimulatorSettings):
     SIMULATOR_NAME = "NVC"

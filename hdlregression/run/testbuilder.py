@@ -17,8 +17,8 @@ import fnmatch
 
 from ..construct.container import Container
 from ..report.logger import Logger
-from ..construct.hdlfile import VHDLFile, VerilogFile
-from .hdltests import VHDLTest, VerilogTest, TestStatus
+from ..construct.hdlfile import VHDLFile, VerilogFile, BSVFile
+from .hdltests import VHDLTest, VerilogTest, TestStatus, BluespecTest
 
 
 class TestBuilder:
@@ -57,6 +57,13 @@ class TestBuilder:
         """
         # Build all possible tests as starting point
         self._build_base_tests()
+        self.build_list_of_tests_to_run_base(re_run_tc_list)
+
+    def build_list_of_tests_to_run_base(self, re_run_tc_list):
+        """
+        Builds a list of all testbenches and testcases
+        that are selected to be run.
+        """
 
         # Create test output folder names
         for test in self.base_tests_container.get():
@@ -469,7 +476,6 @@ class TestBuilder:
         Will return test object based on HDL file type.
         """
         hdlfile = tb.get_hdlfile()
-
         if isinstance(hdlfile, VHDLFile):
             test = VHDLTest(
                 tb=tb, arch=arch, tc=tc, gc=gc, settings=self.project.settings
@@ -480,6 +486,12 @@ class TestBuilder:
             return test
         elif isinstance(hdlfile, VerilogFile):
             test = VerilogTest(tb=tb, settings=self.project.settings)
+            test.set_hdlfile(hdlfile)
+            self.test_id_count += 1
+            test.set_id_number(self.test_id_count)
+            return test
+        elif isinstance(hdlfile, BSVFile):
+            test = BluespecTest(tb=tb, settings=self.project.settings)
             test.set_hdlfile(hdlfile)
             self.test_id_count += 1
             test.set_id_number(self.test_id_count)

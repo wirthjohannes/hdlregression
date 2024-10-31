@@ -395,3 +395,79 @@ class VerilogTest(HdlRegressionTest):
                             gc_str += " -g" + generic_name + "=" + generic_value
 
         return gc_str
+    
+class BluespecTest(HdlRegressionTest):
+    def __init__(self, tb=None, tc=None, gc=[], settings=None):
+        super().__init__(tb=tb, settings=settings)
+        self.tc = None
+        self.gc = None
+        self.set_tc(tc)
+        self.set_gc(gc)
+        self.set_netlist_timing(settings.get_netlist_timing())
+        self.elapsed_time = 0
+
+    def set_elapsed_time(self,t):
+        self.elapsed_time = t
+    def get_elapsed_time(self):
+        return self.elapsed_time
+
+    def get_is_verilog(self) -> bool:
+        return False
+
+    def get_library(self):
+        return self.get_tb().get_hdlfile().get_library()
+
+    def get_testcase_name(self) -> str:
+        testcase_name = self.tb.package_name
+
+        return testcase_name
+
+    def set_tc(self, tc) -> None:
+        self.tc = tc
+
+    def get_tc(self) -> str:
+        return self.tc
+
+    def set_gc(self, gc) -> None:
+        if isinstance(gc, list):
+            self.gc = gc
+
+    def get_gc(self) -> list:
+        return self.gc
+
+    def get_gc_str(self, filter_testcase_id=False) -> str:
+        ID_TESTCASE = self.settings.get_testcase_identifier_name().upper()
+
+        tb = self.get_tb()
+
+        # Get list of all parameters that were discovered in this TB
+        tb_disc_parameter_list = [parameter for parameter in tb.get_parameter()]
+
+        # Init the generic call with testcase if applicable
+        tc = self.get_tc()
+
+        gc_str = (
+            "-g" + ID_TESTCASE + "=" + tc
+            if (tc and (filter_testcase_id is False))
+            else ""
+        )
+
+        generic_list = self.get_gc()
+
+        if generic_list is not None:
+            generic_name = ""
+            for idx, gc_item in enumerate(generic_list):
+
+                if idx % 2 == 0:
+                    generic_name = gc_item.upper()
+                else:
+                    generic_value = str(gc_item)
+
+                    # Filter out any non-valid generics
+                    if generic_name in tb_disc_parameter_list:
+                        if not gc_str:
+                            gc_str = "-g" + generic_name + "=" + generic_value
+                        else:
+                            gc_str += " -g" + generic_name + "=" + generic_value
+
+        return gc_str

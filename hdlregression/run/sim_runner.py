@@ -575,7 +575,7 @@ class SimRunner:
     def _get_ignored_error_detection_str(self) -> str:
         return ""
 
-    def _run_cmd(self, command, path="./", output_file=None, test=None) -> bool:
+    def _run_cmd(self, command, path="./", output_file=None, test=None, suppressErrors=False) -> bool:
         """
         Runs selected command(s), checks for simulator warning/error.
 
@@ -596,7 +596,7 @@ class SimRunner:
 
         def show_errors_and_warnings() -> tuple:
             # override or compilation
-            if self.project.settings.get_show_err_warn_output() is True or test is None:
+            if (self.project.settings.get_show_err_warn_output() is True or test is None) and suppressErrors is False:
                 return True
             # simulation
             else:
@@ -802,11 +802,12 @@ class SimRunner:
                 return ""
 
         def format_test_details_string(
-            test_str_result, sim_num_errors_and_warnings_str
+            test, test_str_result, sim_num_errors_and_warnings_str
         ):
             sim_end_time = round(time.time() * 1000)
             elapsed_time = sim_end_time - sim_start_time
             sim_sec, sim_min, sim_hrs = convert_from_millisec(elapsed_time)
+            test.set_elapsed_time(elapsed_time)
             return "{}{} ({}h:{}m:{}s){}.\n".format(
                 test.get_terminal_test_string(),
                 test_str_result,
@@ -825,7 +826,7 @@ class SimRunner:
                 test
             )
             test_details_str = format_test_details_string(
-                test_str_result, sim_num_errors_and_warnings_str
+                test, test_str_result, sim_num_errors_and_warnings_str
             )
             test.set_terminal_test_details_str(test_details_str)
 

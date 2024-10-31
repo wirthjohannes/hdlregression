@@ -346,3 +346,24 @@ class VerilogModule(BaseModule):
 
     def get_has_testcase(self) -> bool:
         return len(self.testcase_list) > 0
+
+
+class BluespecModule(BaseModule):
+
+    def __init__(self, name, library, logger):
+        super().__init__(logger)
+        super().set_name(name)
+        super().set_type("bluespec_module")
+        super().set_library(library)
+        self.parameter_list = []
+        self.testcase_list = [name]
+        self.package_name = name
+
+    def get_testcase(self) -> list:
+        return self.testcase_list
+
+    def get_has_testcase(self) -> bool:
+        return len(self.testcase_list) > 0
+
+    def get_parameter(self) -> list:
+        return self.parameter_list

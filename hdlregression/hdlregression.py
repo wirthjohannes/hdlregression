@@ -32,6 +32,7 @@ from .report.jsonreporter import JSONReporter
 from .report.csvreporter import CSVReporter
 from .report.txtreporter import TXTReporter
 from .report.xmlreporter import XMLReporter
+from .report.junitreporter import JUNITReporter
 from .run.tcl_runner import TclRunner
 from .run.cmd_runner import CommandRunner
 from .run.runner_modelsim import ModelsimRunner
@@ -47,6 +48,7 @@ import os
 import pickle
 from signal import signal, SIGINT
 from hdlregression.run.vivado_runner import VivadoRunner
+from .run.bluesim_runner import BluesimRunner
 
 # Enable terminal colors on windows OS
 if os.name == "nt":
@@ -329,6 +331,8 @@ class HDLRegression:
             self.reporter = CSVReporter(filename=report_file, project=self)
         elif report_file.lower().endswith(".json"):
             self.reporter = JSONReporter(filename=report_file, project=self)
+        elif report_file.lower().endswith(".junit.xml"):
+            self.reporter = JUNITReporter(filename=report_file, project=self)
         elif report_file.lower().endswith(".xml"):
             self.reporter = XMLReporter(filename=report_file, project=self)
         else:
@@ -1105,6 +1109,8 @@ class HDLRegression:
             runner_obj = NVCRunner(project=self)
         elif simulator == "VIVADO":
             runner_obj = VivadoRunner(project=self)
+        elif simulator == "BLUESIM":
+            runner_obj = BluesimRunner(project=self)
         else:
             sim_info = self.settings.get_simulators_info()
             sim_name = sim_info.get("simulator")

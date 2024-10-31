@@ -19,6 +19,7 @@ import time
 
 from ..scan.vhdlscanner import VHDLScanner
 from ..scan.verilogscanner import VerilogScanner
+from ..construct.hdl_modules_pkg import BluespecModule
 
 
 class HDLFile:
@@ -505,7 +506,46 @@ class SVFile(HDLFile):
         if filetype.lower() == "systemverilog":
             return True
         return False
+    
+class BSVFile(HDLFile):
 
+    def __init__(
+        self,
+        filename_with_path,
+        project,
+        library,
+        hdl_version,
+        com_options,
+        parse_file,
+        code_coverage,
+    ):
+        super().__init__(
+            filename_with_path,
+            project,
+            library,
+            hdl_version,
+            com_options,
+            parse_file,
+            code_coverage,
+        )
+
+    def check_file_type(self, filetype) -> bool:
+        if filetype.lower() == "bluespec":
+            return True
+        return False
+    
+
+
+    def get_tb_modules(self) -> list:
+        """
+        Builds and returns a list of all TB modules
+        that have been created after scanning the file.
+        """
+        module = BluespecModule(
+            name=self.get_name(), library=self.get_library(), logger=self.library.logger
+        )
+        module.set_hdlfile(self)
+        return [module]
 
 class UnknownFile(HDLFile):
 
