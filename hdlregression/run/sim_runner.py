@@ -575,7 +575,7 @@ class SimRunner:
     def _get_ignored_error_detection_str(self) -> str:
         return ""
 
-    def _run_cmd(self, command, path="./", output_file=None, test=None, suppressErrors=False) -> bool:
+    def _run_cmd(self, command, path="./", output_file=None, test=None, suppressErrors=False, timeout=None) -> bool:
         """
         Runs selected command(s), checks for simulator warning/error.
 
@@ -615,7 +615,7 @@ class SimRunner:
         show_sim_errors_and_warnings = show_errors_and_warnings()
 
         for line, success in cmd_runner.run(
-            command=command, path=path, env=self.env_var, output_file=output_file
+            command=command, path=path, env=self.env_var, output_file=output_file, timeout=timeout
         ):
             line = line.strip()
 

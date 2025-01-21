@@ -19,6 +19,7 @@ import sys
 from threading import Thread
 from queue import Queue, Empty
 from pathlib import Path
+from time import monotonic as _time
 
 from ..report.logger import Logger
 
@@ -84,7 +85,7 @@ class CommandRunner:
                                 close_fds=self.ON_POSIX)  # Close filehandles when done (Only Linux)
 
 
-    def run(self, command, path='./', env=None, output_file=None) -> tuple:
+    def run(self, command, path='./', env=None, output_file=None, timeout = None) -> tuple:
         command = self._convert_to_list(command)
 
         self._create_path_if_missing(path)
@@ -93,6 +94,11 @@ class CommandRunner:
         popen = None
 
         ignored_simulator_exit_codes = self.project.settings.get_ignored_simulator_exit_codes()
+
+        if timeout is not None:
+            endtime = _time() + timeout
+        else:
+            endtime = None
 
         try:
             popen = self._get_process(command, path)
@@ -114,6 +120,7 @@ class CommandRunner:
                 except Empty:
                     transcript_line = None
 
+
                 if return_code is not None:
                     # Program exited and there is no more data in queues
                     # At this point, queue is empty, check if the subprocess is still running
@@ -130,6 +137,11 @@ class CommandRunner:
                         # Subprocess finished, wait for the threads to complete
                         t_stdout.join()
                         t_stderr.join()
+                
+                if (endtime is not None and endtime < _time()):
+                    self.logger.error('Timeout reached, terminating process...')
+                    popen.terminate()
+                    break
 
         except (FileNotFoundError, OSError) as e:
             self.logger.error('Command error: {}.'.format(e))

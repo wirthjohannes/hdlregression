@@ -126,7 +126,7 @@ class BluesimRunner(SimRunner):
         command = ['bash', path + "/out"]
         output = os.path.join(test.get_test_path(), "run.log")
         output = os_adjust_path(output)
-        success = self._run_cmd(command=command, test=test, path=test.get_test_path(), output_file=output)
+        success = self._run_cmd(command=command, test=test, path=test.get_test_path(), output_file=output, timeout=30*60)
         print('---->>> sim done')
         return success
     
